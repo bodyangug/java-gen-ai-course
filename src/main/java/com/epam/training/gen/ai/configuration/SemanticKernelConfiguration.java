@@ -41,7 +41,7 @@ public class SemanticKernelConfiguration {
     public InvocationContext invocationContext() {
         return InvocationContext.builder()
                 .withPromptExecutionSettings(PromptExecutionSettings.builder()
-                        .withTemperature(2.0)
+                        .withTemperature(1.0)
                         .build())
                 .build();
     }
