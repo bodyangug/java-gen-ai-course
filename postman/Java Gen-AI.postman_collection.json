@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "7c915a67-449b-460b-b0c7-9babf9032583",
+		"name": "Java Gen-AI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13632098"
+	},
+	"item": [
+		{
+			"name": "Chat",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"input\": \"I want to find top-10 books about world history\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/chat",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"chat"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
