@@ -6,7 +6,6 @@ import com.microsoft.semantickernel.aiservices.openai.chatcompletion.OpenAIChatC
 import com.microsoft.semantickernel.orchestration.InvocationContext;
 import com.microsoft.semantickernel.orchestration.PromptExecutionSettings;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
-import com.microsoft.semantickernel.services.chatcompletion.ChatHistory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,11 +25,6 @@ public class SemanticKernelConfiguration {
     }
 
     @Bean
-    public ChatHistory chatHistory() {
-        return new ChatHistory("You are a librarian, expert about books");
-    }
-
-    @Bean
     public Kernel kernel(ChatCompletionService chatCompletionService) {
         return Kernel.builder()
                 .withAIService(ChatCompletionService.class, chatCompletionService)
@@ -40,9 +34,10 @@ public class SemanticKernelConfiguration {
     @Bean
     public InvocationContext invocationContext() {
         return InvocationContext.builder()
-                .withPromptExecutionSettings(PromptExecutionSettings.builder()
-                        .withTemperature(1.0)
-                        .build())
+                .withPromptExecutionSettings(
+                        PromptExecutionSettings.builder()
+                                .withTemperature(1.0)
+                                .build())
                 .build();
     }
 }
