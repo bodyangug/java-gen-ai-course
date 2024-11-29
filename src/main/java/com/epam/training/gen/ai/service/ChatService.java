@@ -8,7 +8,7 @@ import com.microsoft.semantickernel.services.chatcompletion.ChatMessageContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,26 +17,31 @@ public class ChatService {
     private final ChatCompletionService chatCompletionService;
     private final Kernel kernel;
     private final InvocationContext invocationContext;
-    private final ChatHistory chatHistory;
+    private final ConcurrentHashMap<String, ChatHistory> userChatHistories = new ConcurrentHashMap<>();
 
     public ChatService(
             @Autowired Kernel kernel,
             @Autowired InvocationContext invocationContext,
-            @Autowired ChatCompletionService chatCompletionService,
-            @Autowired ChatHistory chatHistory) {
+            @Autowired ChatCompletionService chatCompletionService) {
         this.kernel = kernel;
         this.invocationContext = invocationContext;
         this.chatCompletionService = chatCompletionService;
-        this.chatHistory = chatHistory;
     }
 
-    public String ask(String question) {
+    public String ask(String userId, String question) {
+        ChatHistory chatHistory =
+                userChatHistories.computeIfAbsent(userId, id -> new ChatHistory("You are a friendly helper."));
+
         chatHistory.addUserMessage(question);
-        List<ChatMessageContent<?>> reply =
-                chatCompletionService.getChatMessageContentsAsync(chatHistory, kernel, invocationContext)
-                        .block();
-        return reply.stream()
+
+
+        String reply = chatCompletionService.getChatMessageContentsAsync(chatHistory, kernel, invocationContext)
+                .block()
+                .stream()
                 .map(ChatMessageContent::getContent)
                 .collect(Collectors.joining());
+
+        chatHistory.addAssistantMessage(reply);
+        return reply;
     }
 }
