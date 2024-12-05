@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"input\": \"I want to find top-10 books about world history\"\n}",
+					"raw": "{\n    \"input\": \"I want to find top-10 books about world history\",\n    \"user-id\":\"1\",\n    \"model-id\": \"gpt-35-turbo\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
