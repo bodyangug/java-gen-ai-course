@@ -10,13 +10,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 
 @Configuration
 public class SemanticKernelConfiguration {
 
     @Bean
-    public ChatCompletionService chatCompletionService(
-            @Value("${client-azureopenai-deployment-name}") String deploymentOrModelName,
+    public ChatCompletionService defaultChatCompletionService(
+            @Value("${client-azureopenai-deployments.default}") String deploymentOrModelName,
             OpenAIAsyncClient openAIAsyncClient) {
         return OpenAIChatCompletion.builder()
                 .withModelId(deploymentOrModelName)
@@ -25,9 +27,20 @@ public class SemanticKernelConfiguration {
     }
 
     @Bean
-    public Kernel kernel(ChatCompletionService chatCompletionService) {
+    public ChatCompletionService customChatCompletionService(
+            @Value("${client-azureopenai-deployments.custom}") String deploymentOrModelName,
+            OpenAIAsyncClient openAIAsyncClient) {
+        return OpenAIChatCompletion.builder()
+                .withModelId(deploymentOrModelName)
+                .withOpenAIAsyncClient(openAIAsyncClient)
+                .build();
+    }
+
+    @Bean
+    public Kernel kernel(List<ChatCompletionService> chatCompletionServices) {
         return Kernel.builder()
-                .withAIService(ChatCompletionService.class, chatCompletionService)
+                .withAIService(ChatCompletionService.class,
+                        chatCompletionServices.get(0)) // Default to the first service
                 .build();
     }
 
@@ -37,6 +50,7 @@ public class SemanticKernelConfiguration {
                 .withPromptExecutionSettings(
                         PromptExecutionSettings.builder()
                                 .withTemperature(1.0)
+                                .withTopP(0.5)
                                 .build())
                 .build();
     }

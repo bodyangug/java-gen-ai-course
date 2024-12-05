@@ -20,4 +20,6 @@ public class InputRequest implements Serializable {
     @JsonProperty("user-id")
     private String userId;
     private String input;
+    @JsonProperty("model-id")
+    private String modelId;
 }

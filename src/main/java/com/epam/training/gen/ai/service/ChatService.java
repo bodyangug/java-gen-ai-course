@@ -8,32 +8,42 @@ import com.microsoft.semantickernel.services.chatcompletion.ChatMessageContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
 public class ChatService {
-
-    private final ChatCompletionService chatCompletionService;
     private final Kernel kernel;
     private final InvocationContext invocationContext;
     private final ConcurrentHashMap<String, ChatHistory> userChatHistories = new ConcurrentHashMap<>();
+    private final Map<String, ChatCompletionService> chatCompletionServices = new ConcurrentHashMap<>();
 
+    @Autowired
     public ChatService(
-            @Autowired Kernel kernel,
-            @Autowired InvocationContext invocationContext,
-            @Autowired ChatCompletionService chatCompletionService) {
+            Kernel kernel,
+            InvocationContext invocationContext,
+            List<ChatCompletionService> chatCompletionServiceList) {
         this.kernel = kernel;
         this.invocationContext = invocationContext;
-        this.chatCompletionService = chatCompletionService;
+
+        for (ChatCompletionService service : chatCompletionServiceList) {
+            this.chatCompletionServices.put(service.getModelId(), service);
+        }
     }
 
-    public String ask(String userId, String question) {
+    public String ask(String userId, String question, String modelId) {
+        ChatCompletionService chatCompletionService = chatCompletionServices.get(modelId);
+
+        if (chatCompletionService == null) {
+            throw new IllegalArgumentException("Model not found: " + modelId);
+        }
+
         ChatHistory chatHistory =
                 userChatHistories.computeIfAbsent(userId, id -> new ChatHistory("You are a friendly helper."));
 
         chatHistory.addUserMessage(question);
-
 
         String reply = chatCompletionService.getChatMessageContentsAsync(chatHistory, kernel, invocationContext)
                 .block()

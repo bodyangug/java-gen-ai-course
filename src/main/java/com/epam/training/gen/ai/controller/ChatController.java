@@ -12,14 +12,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Controller()
+@Controller
 public class ChatController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private final ChatService chatService;
 
-    public ChatController(@Autowired ChatService chatService) {
+    @Autowired
+    public ChatController(ChatService chatService) {
         this.chatService = chatService;
     }
 
@@ -27,7 +27,12 @@ public class ChatController {
     public ResponseEntity<InputResponse> controller(@RequestBody InputRequest request) {
         logger.info("Received chat input: {}", request.getInput());
         try {
-            return ResponseEntity.ok(new InputResponse(chatService.ask(request.getUserId(), request.getInput())));
+            String response = chatService.ask(request.getUserId(), request.getInput(), request.getModelId());
+            return ResponseEntity.ok(new InputResponse(response));
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid model ID", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new InputResponse(e.getMessage()));
         } catch (Exception e) {
             logger.error("Error processing chat request", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
