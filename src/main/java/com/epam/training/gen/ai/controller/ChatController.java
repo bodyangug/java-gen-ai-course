@@ -27,7 +27,7 @@ public class ChatController {
     public ResponseEntity<InputResponse> controller(@RequestBody InputRequest request) {
         logger.info("Received chat input: {}", request.getInput());
         try {
-            return ResponseEntity.ok(new InputResponse(chatService.ask(request.getInput())));
+            return ResponseEntity.ok(new InputResponse(chatService.ask(request.getUserId(), request.getInput())));
         } catch (Exception e) {
             logger.error("Error processing chat request", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
