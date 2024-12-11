@@ -7,9 +7,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+/**
+ * Configuration class for setting up the OpenAI client.
+ * This class defines the configuration required to connect to the Azure OpenAI service.
+ */
 @Configuration
 public class OpenAIConfiguration {
 
+    /**
+     * Creates and configures an asynchronous OpenAI client.
+     *
+     * @param apiKey   the API key used for authenticating with the Azure OpenAI service
+     * @param endpoint the endpoint URL of the Azure OpenAI service
+     * @return an instance of {@link OpenAIAsyncClient}
+     */
     @Bean
     public OpenAIAsyncClient openAIAsyncClient(
             @Value("${client-azureopenai-key}") String apiKey,
