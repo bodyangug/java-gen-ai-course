@@ -1,10 +1,19 @@
 package com.epam.training.gen.ai.configuration;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
+import com.epam.training.gen.ai.plugins.AgeCalculatorPlugin;
+import com.epam.training.gen.ai.plugins.CurrencyConverterPlugin;
+import com.epam.training.gen.ai.plugins.WeatherForecastPlugin;
 import com.microsoft.semantickernel.Kernel;
 import com.microsoft.semantickernel.aiservices.openai.chatcompletion.OpenAIChatCompletion;
+import com.microsoft.semantickernel.contextvariables.ContextVariableTypes;
+import com.microsoft.semantickernel.contextvariables.converters.ContextVariableJacksonConverter;
 import com.microsoft.semantickernel.orchestration.InvocationContext;
+import com.microsoft.semantickernel.orchestration.InvocationReturnMode;
 import com.microsoft.semantickernel.orchestration.PromptExecutionSettings;
+import com.microsoft.semantickernel.orchestration.ToolCallBehavior;
+import com.microsoft.semantickernel.plugin.KernelPlugin;
+import com.microsoft.semantickernel.plugin.KernelPluginFactory;
 import com.microsoft.semantickernel.services.chatcompletion.ChatCompletionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -57,6 +66,36 @@ public class SemanticKernelConfiguration {
     }
 
     /**
+     * Creates a KernelPlugin bean for the age calculator functionality.
+     *
+     * @return a KernelPlugin instance for age calculation.
+     */
+    @Bean
+    public KernelPlugin ageCalculatorPlugin() {
+        return KernelPluginFactory.createFromObject(new AgeCalculatorPlugin(), "AgeCalculatorPlugin");
+    }
+
+    /**
+     * Creates a KernelPlugin bean for the weather forecast functionality.
+     *
+     * @return a KernelPlugin instance for weather forecasting.
+     */
+    @Bean
+    public KernelPlugin weatherForecastPlugin() {
+        return KernelPluginFactory.createFromObject(new WeatherForecastPlugin(), "WeatherForecastPlugin");
+    }
+
+    /**
+     * Creates a KernelPlugin bean for the currency converter functionality.
+     *
+     * @return a KernelPlugin instance for currency conversion.
+     */
+    @Bean
+    public KernelPlugin currencyConverterPlugin() {
+        return KernelPluginFactory.createFromObject(new CurrencyConverterPlugin(), "CurrencyConverterPlugin");
+    }
+
+    /**
      * Configures the {@link Kernel} instance with the provided list of {@link ChatCompletionService}.
      * The kernel is responsible for managing AI services and interactions.
      *
@@ -64,10 +103,17 @@ public class SemanticKernelConfiguration {
      * @return an instance of {@link Kernel} configured with the chat completion service
      */
     @Bean
-    public Kernel kernel(List<ChatCompletionService> chatCompletionServices) {
+    public Kernel kernel(List<ChatCompletionService> chatCompletionServices,
+                         KernelPlugin ageCalculatorPlugin,
+                         KernelPlugin weatherForecastPlugin,
+                         KernelPlugin currencyConverterPlugin) {
+        ContextVariableTypes.addGlobalConverter(ContextVariableJacksonConverter.create(CurrencyConverterPlugin.class));
+
         return Kernel.builder()
-                .withAIService(ChatCompletionService.class,
-                        chatCompletionServices.get(0)) // Default to the first service
+                .withAIService(ChatCompletionService.class, chatCompletionServices.get(0))
+                .withPlugin(ageCalculatorPlugin)
+                .withPlugin(weatherForecastPlugin)
+                .withPlugin(currencyConverterPlugin)
                 .build();
     }
 
@@ -85,6 +131,8 @@ public class SemanticKernelConfiguration {
                                 .withTemperature(1.0)
                                 .withTopP(0.5)
                                 .build())
+                .withReturnMode(InvocationReturnMode.LAST_MESSAGE_ONLY)
+                .withToolCallBehavior(ToolCallBehavior.allowAllKernelFunctions(true))
                 .build();
     }
 }
