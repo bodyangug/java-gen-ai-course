@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"input\": \"I want to find top-10 books about world history\",\n    \"user-id\":\"1\",\n    \"model-id\": \"gpt-35-turbo\"\n}",
+					"raw": "{\n    \"input\": \"forecast weather in Kharkiv\",\n    \"user-id\":\"1\",\n    \"model-id\": \"gpt-4-0613\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -29,6 +29,93 @@
 					"port": "8080",
 					"path": [
 						"chat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Embedding-Build",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"Hello world!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/embeddings/build",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"embeddings",
+						"build"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Embedding-Build and Store",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"Hello world!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/embeddings/build-and-store",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"embeddings",
+						"build-and-store"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Embedding-Search",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"Hello!\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/embeddings/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"embeddings",
+						"search"
 					]
 				}
 			},
