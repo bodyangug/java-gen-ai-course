@@ -63,3 +63,17 @@ Plugins:
 - Logs output:
 
   <img src="img/lab_04_logs_output.png" alt="Logs">
+
+## Lab 5:
+
+1. Call `build` endpoint to get embeddings for `text` field:
+
+  <img src="img/lab_05_build_endpoint.png" alt="Logs">
+
+2. Call `build and store` endpoint to get embedding and store result to vector DB:
+
+  <img src="img/lab_05_build_and_store.png" alt="Logs">
+
+3. Call `search` endpoint to search similarity by input `text` field:
+
+  <img src="img/lab_05_search_endpoint.png" alt="Logs">
