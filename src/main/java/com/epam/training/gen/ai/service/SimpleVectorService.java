@@ -14,11 +14,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import static io.qdrant.client.PointIdFactory.id;
+import static io.qdrant.client.ValueFactory.value;
 import static io.qdrant.client.VectorsFactory.vectors;
+import static io.qdrant.client.WithPayloadSelectorFactory.enable;
 
 /**
  * Service class for handling vector operations such as building embeddings, saving vectors, and searching.
@@ -63,13 +66,16 @@ public class SimpleVectorService {
      * @throws InterruptedException if the thread is interrupted during execution
      */
     public void processAndSaveText(String text) throws ExecutionException, InterruptedException {
-        var embeddings = getEmbeddings(text);
-        var points = new ArrayList<List<Float>>();
-        embeddings.forEach(embeddingItem -> points.add(new ArrayList<>(embeddingItem.getEmbedding())));
-
+        List<String> textChunks = splitText(text, 500, 50);
         var pointStructs = new ArrayList<Points.PointStruct>();
-        points.forEach(point -> pointStructs.add(getPointStruct(point)));
+        for (String chunk : textChunks) {
+            var embeddings = getEmbeddings(chunk);
 
+            for (var embeddingItem : embeddings) {
+                var point = new ArrayList<>(embeddingItem.getEmbedding());
+                pointStructs.add(getPointStruct(point, chunk));
+            }
+        }
         saveVector(pointStructs);
     }
 
@@ -90,7 +96,9 @@ public class SimpleVectorService {
                         Points.SearchPoints.newBuilder()
                                 .setCollectionName(collectionName)
                                 .addAllVector(qe)
-                                .setLimit(5)
+                                .setLimit(50)
+                                .setWithPayload(enable(true))
+                                .setScoreThreshold(0.8f)
                                 .build()
                 ).get();
     }
@@ -148,10 +156,11 @@ public class SimpleVectorService {
      * @param point the vector values
      * @return a {@link Points.PointStruct} object containing the vector and associated metadata
      */
-    private Points.PointStruct getPointStruct(List<Float> point) {
+    private Points.PointStruct getPointStruct(List<Float> point, String chunk) {
         return Points.PointStruct.newBuilder()
                 .setId(id(UUID.randomUUID()))
                 .setVectors(vectors(point))
+                .putAllPayload(Map.of("content", value(chunk)))
                 .build();
     }
 
@@ -164,5 +173,26 @@ public class SimpleVectorService {
     private Mono<Embeddings> retrieveEmbeddings(String text) {
         var qembeddingsOptions = new EmbeddingsOptions(List.of(text));
         return openAIAsyncClient.getEmbeddings(embeddingModel, qembeddingsOptions);
+    }
+
+    /**
+     * Splits a given text into chunks of a specified size with optional overlap between chunks.
+     *
+     * @param text      The text to be split into chunks.
+     * @param chunkSize The size of each chunk.
+     * @param overlap   The number of overlapping characters between consecutive chunks.
+     * @return A {@link List} of strings, where each string represents a chunk of the original text.
+     */
+    private List<String> splitText(String text, int chunkSize, int overlap) {
+        List<String> chunks = new ArrayList<>();
+        int start = 0;
+
+        while (start < text.length()) {
+            int end = Math.min(start + chunkSize, text.length());
+            String chunk = text.substring(start, end);
+            chunks.add(chunk);
+            start += chunkSize - overlap;
+        }
+        return chunks;
     }
 }

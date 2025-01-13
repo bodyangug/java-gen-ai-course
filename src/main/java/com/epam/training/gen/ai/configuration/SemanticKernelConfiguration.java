@@ -2,8 +2,10 @@ package com.epam.training.gen.ai.configuration;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
 import com.epam.training.gen.ai.plugins.AgeCalculatorPlugin;
+import com.epam.training.gen.ai.plugins.ContentRetrieverPlugin;
 import com.epam.training.gen.ai.plugins.CurrencyConverterPlugin;
 import com.epam.training.gen.ai.plugins.WeatherForecastPlugin;
+import com.epam.training.gen.ai.service.RagService;
 import com.microsoft.semantickernel.Kernel;
 import com.microsoft.semantickernel.aiservices.openai.chatcompletion.OpenAIChatCompletion;
 import com.microsoft.semantickernel.contextvariables.ContextVariableTypes;
@@ -96,6 +98,18 @@ public class SemanticKernelConfiguration {
     }
 
     /**
+     * Creates and registers a {@link KernelPlugin} bean for the ContentRetrieverPlugin.
+     * This plugin allows the system to retrieve context based on user queries using the RAG service.
+     *
+     * @param ragService The {@link RagService} instance used for retrieving context data.
+     * @return A {@link KernelPlugin} instance wrapping the ContentRetrieverPlugin.
+     */
+    @Bean
+    public KernelPlugin contextRetrieverPlugin(RagService ragService) {
+        return KernelPluginFactory.createFromObject(new ContentRetrieverPlugin(ragService), "ContentRetrieverPlugin");
+    }
+
+    /**
      * Configures the {@link Kernel} instance with the provided list of {@link ChatCompletionService}.
      * The kernel is responsible for managing AI services and interactions.
      *
@@ -106,7 +120,8 @@ public class SemanticKernelConfiguration {
     public Kernel kernel(List<ChatCompletionService> chatCompletionServices,
                          KernelPlugin ageCalculatorPlugin,
                          KernelPlugin weatherForecastPlugin,
-                         KernelPlugin currencyConverterPlugin) {
+                         KernelPlugin currencyConverterPlugin,
+                         KernelPlugin contextRetrieverPlugin) {
         ContextVariableTypes.addGlobalConverter(ContextVariableJacksonConverter.create(CurrencyConverterPlugin.class));
 
         return Kernel.builder()
@@ -114,6 +129,7 @@ public class SemanticKernelConfiguration {
                 .withPlugin(ageCalculatorPlugin)
                 .withPlugin(weatherForecastPlugin)
                 .withPlugin(currencyConverterPlugin)
+                .withPlugin(contextRetrieverPlugin)
                 .build();
     }
 
