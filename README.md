@@ -77,3 +77,21 @@ Plugins:
 3. Call `search` endpoint to search similarity by input `text` field:
 
   <img src="img/lab_05_search_endpoint.png" alt="Logs">
+
+## Lab 6:
+
+1. Upload to context [christmasday.pdf](docs/christmasday.pdf):
+
+<img src="img/lab_06_upload_context.png" alt="Upload context">
+
+2. Check qdrant collections:
+
+<img src="img/lab_06_qdrant_points.png" alt="qdrant">
+
+3. Ask question from context:
+
+<img src="img/lab_06_with_context.png" alt="With context">
+
+4. Ask not related to context question:
+
+<img src="img/lab_06_no_context.png" alt="Without context">
