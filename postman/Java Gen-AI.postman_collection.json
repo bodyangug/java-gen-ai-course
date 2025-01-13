@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "Chat",
+			"name": "Raw Chat",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -35,7 +35,66 @@
 			"response": []
 		},
 		{
-			"name": "Embedding-Build",
+			"name": "[RAG] Search by context",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"input\": \"What do you know about Christmasday?\",\n    \"user-id\":\"2\",\n    \"model-id\": \"gpt-4-0613\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/rag/answer-by-context",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rag",
+						"answer-by-context"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[RAG] Upload context",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "content",
+							"type": "file",
+							"src": "/Users/mac/Downloads/christmasday.pdf"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/rag/upload-context",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"rag",
+						"upload-context"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[Embedding] Build",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -64,13 +123,13 @@
 			"response": []
 		},
 		{
-			"name": "Embedding-Build and Store",
+			"name": "[Embedding] Build and Store",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"text\": \"Hello world!\"\n}",
+					"raw": "{\n    \"text\": \"Hello world! Hello Mars!\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -93,13 +152,13 @@
 			"response": []
 		},
 		{
-			"name": "Embedding-Search",
+			"name": "[Embedding] Search",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"text\": \"Hello!\"\n}",
+					"raw": "{\n    \"text\": \"Hi\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
