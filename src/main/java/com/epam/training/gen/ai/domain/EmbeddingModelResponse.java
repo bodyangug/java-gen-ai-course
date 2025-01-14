@@ -32,6 +32,12 @@ public class EmbeddingModelResponse {
     private Float score;
 
     /**
+     * Represents a portion of text or data retrieved as part of the context.
+     * This field typically contains a single chunk of relevant information.
+     */
+    private String chunk;
+
+    /**
      * Converts a {@link Points.ScoredPoint} object into an {@link EmbeddingModelResponse} DTO.
      *
      * @param scoredPoint the scored point retrieved from the vector database
@@ -40,7 +46,8 @@ public class EmbeddingModelResponse {
     public static EmbeddingModelResponse toDTO(Points.ScoredPoint scoredPoint) {
         return new EmbeddingModelResponse(
                 scoredPoint.getId().getNum(),
-                scoredPoint.getScore()
+                scoredPoint.getScore(),
+                scoredPoint.getPayloadMap().get("content").getStringValue()
         );
     }
 }
